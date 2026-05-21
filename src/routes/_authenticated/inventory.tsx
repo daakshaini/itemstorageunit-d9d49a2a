@@ -36,7 +36,7 @@ function InventoryPage() {
   };
 
   useEffect(() => {
-    document.title = "My Inventory — InventoryHub";
+    document.title = "My Inventory — Item Storage Unit";
     load();
   }, []);
 
@@ -84,6 +84,7 @@ function InventoryPage() {
                 <TableHead className="text-right">Price</TableHead>
                 <TableHead className="text-right">Qty</TableHead>
                 <TableHead className="text-right">Total</TableHead>
+                <TableHead>Added On</TableHead>
                 <TableHead className="w-16"></TableHead>
               </TableRow>
             </TableHeader>
@@ -95,6 +96,9 @@ function InventoryPage() {
                   <TableCell className="text-right">${Number(it.item_price).toFixed(2)}</TableCell>
                   <TableCell className="text-right">{it.quantity}</TableCell>
                   <TableCell className="text-right font-semibold">${(it.item_price * it.quantity).toFixed(2)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                    {new Date(it.created_at).toLocaleString()}
+                  </TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(it.id)}
                       className="text-destructive hover:bg-destructive/10">

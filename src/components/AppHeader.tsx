@@ -18,7 +18,7 @@ export function AppHeader({ username }: { username?: string | null }) {
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/inventory" className="flex items-center gap-2 font-bold text-primary text-lg">
           <Package className="w-6 h-6" />
-          InventoryHub
+          Item Storage Unit
         </Link>
         <nav className="hidden sm:flex items-center gap-1">
           <Button asChild variant="ghost" size="sm">
