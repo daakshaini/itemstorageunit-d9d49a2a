@@ -70,7 +70,17 @@ function NewItemPage() {
             </div>
             <div>
               <Label htmlFor="qt">Quantity</Label>
-              <Input id="qt" type="number" min="0" value={form.quantity} onChange={(e) => update("quantity", e.target.value)} required />
+              <div className="flex items-center gap-2">
+                <Button type="button" variant="outline" size="icon" onClick={() => {
+                  const val = Math.max(0, (parseInt(form.quantity, 10) || 0) - 1);
+                  update("quantity", String(val));
+                }}>-</Button>
+                <Input id="qt" value={form.quantity} onChange={(e) => update("quantity", e.target.value.replace(/\D/g, ""))} inputMode="numeric" required className="text-center" />
+                <Button type="button" variant="outline" size="icon" onClick={() => {
+                  const val = (parseInt(form.quantity, 10) || 0) + 1;
+                  update("quantity", String(val));
+                }}>+</Button>
+              </div>
             </div>
           </div>
           <div className="flex gap-2 pt-2">
