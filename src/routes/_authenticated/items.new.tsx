@@ -57,7 +57,7 @@ function NewItemPage() {
         <form onSubmit={submit} className="space-y-4">
           <div>
             <Label htmlFor="pn">Part Number</Label>
-            <Input id="pn" value={form.part_number} onChange={(e) => update("part_number", e.target.value)} placeholder="e.g. PN-001" required />
+            <Input id="pn" value={form.part_number} onChange={(e) => update("part_number", e.target.value)} placeholder="Enter 12 digits" maxLength={12} inputMode="numeric" required />
           </div>
           <div>
             <Label htmlFor="nm">Item Name</Label>
