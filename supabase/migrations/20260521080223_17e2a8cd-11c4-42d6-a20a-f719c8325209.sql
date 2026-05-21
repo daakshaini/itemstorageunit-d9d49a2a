@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.username_exists(TEXT) TO authenticated;
