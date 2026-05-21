@@ -24,6 +24,7 @@ function NewItemPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.part_number || !form.item_name) return toast.error("Fill all fields");
+    if (!/^\d{12}$/.test(form.part_number.trim())) return toast.error("Part Number must be exactly 12 digits");
     const price = parseFloat(form.item_price);
     const qty = parseInt(form.quantity, 10);
     if (isNaN(price) || price < 0) return toast.error("Invalid price");
@@ -56,7 +57,7 @@ function NewItemPage() {
         <form onSubmit={submit} className="space-y-4">
           <div>
             <Label htmlFor="pn">Part Number</Label>
-            <Input id="pn" value={form.part_number} onChange={(e) => update("part_number", e.target.value)} placeholder="e.g. PN-001" required />
+            <Input id="pn" value={form.part_number} onChange={(e) => update("part_number", e.target.value)} placeholder="Enter 12 digits" maxLength={12} inputMode="numeric" required />
           </div>
           <div>
             <Label htmlFor="nm">Item Name</Label>
