@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Plus, Boxes } from "lucide-react";
+import { Trash2, Plus, Boxes, Minus } from "lucide-react";
 import { toast } from "sonner";
 
 type Item = {
