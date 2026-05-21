@@ -48,6 +48,15 @@ function InventoryPage() {
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
+  const adjustQuantity = async (id: string, delta: number) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    const newQty = Math.max(1, item.quantity + delta);
+    const { error } = await supabase.from("items").update({ quantity: newQty }).eq("id", id);
+    if (error) return toast.error(error.message);
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity: newQty } : i)));
+  };
+
   const total = items.reduce((s, i) => s + i.item_price * i.quantity, 0);
 
   return (
