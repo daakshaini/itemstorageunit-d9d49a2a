@@ -24,6 +24,7 @@ function NewItemPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.part_number || !form.item_name) return toast.error("Fill all fields");
+    if (!/^\d{12}$/.test(form.part_number.trim())) return toast.error("Part Number must be exactly 12 digits");
     const price = parseFloat(form.item_price);
     const qty = parseInt(form.quantity, 10);
     if (isNaN(price) || price < 0) return toast.error("Invalid price");
