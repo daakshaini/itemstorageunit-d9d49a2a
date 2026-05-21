@@ -29,9 +29,6 @@ function Index() {
         <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-foreground">
           Manage your inventory <span className="text-primary">securely</span>
         </h1>
-        <p className="mt-6 text-lg text-muted-foreground">
-          A private, per-account item storage system. Track part numbers, prices, and quantities — your data stays yours.
-        </p>
         <div className="mt-8 flex gap-3 justify-center">
           <Button asChild size="lg"><Link to="/signup">Get Started</Link></Button>
           <Button asChild size="lg" variant="outline"><Link to="/login">I have an account</Link></Button>
