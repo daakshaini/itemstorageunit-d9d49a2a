@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { PackagePlus } from "lucide-react";
+import { logActivity } from "@/lib/activity";
 
 export const Route = createFileRoute("/_authenticated/items/new")({
   component: NewItemPage,
@@ -34,15 +35,16 @@ function NewItemPage() {
     const { data: userRes } = await supabase.auth.getUser();
     if (!userRes.user) { setLoading(false); return toast.error("Not authenticated"); }
 
-    const { error } = await supabase.from("items").insert({
+    const { data: inserted, error } = await supabase.from("items").insert({
       user_id: userRes.user.id,
       part_number: form.part_number.trim(),
       item_name: form.item_name.trim(),
       item_price: price,
       quantity: qty,
-    });
+    }).select("id, item_name").single();
     setLoading(false);
     if (error) return toast.error(error.message);
+    await logActivity({ action: "create", itemName: inserted?.item_name, itemId: inserted?.id });
     toast.success("Item added");
     navigate({ to: "/inventory" });
   };
