@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash2, Plus, Boxes, Minus } from "lucide-react";
 import { toast } from "sonner";
+import { logActivity } from "@/lib/activity";
 
 type Item = {
   id: string;
@@ -42,8 +43,10 @@ function InventoryPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this item?")) return;
+    const item = items.find((i) => i.id === id);
     const { error } = await supabase.from("items").delete().eq("id", id);
     if (error) return toast.error(error.message);
+    await logActivity({ action: "delete", itemName: item?.item_name, itemId: id });
     toast.success("Item deleted");
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
@@ -54,6 +57,7 @@ function InventoryPage() {
     const newQty = Math.max(1, item.quantity + delta);
     const { error } = await supabase.from("items").update({ quantity: newQty }).eq("id", id);
     if (error) return toast.error(error.message);
+    await logActivity({ action: "update", itemName: item.item_name, itemId: id, details: { from: item.quantity, to: newQty } });
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity: newQty } : i)));
   };
 
