@@ -21,7 +21,7 @@ export async function logActivity(params: {
       action: params.action,
       item_name: params.itemName ?? null,
       item_id: params.itemId ?? null,
-      details: params.details ?? null,
+      details: (params.details ?? null) as never,
     });
   } catch (e) {
     console.error("[activity log]", e);
