@@ -1,11 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Package, LogOut, Plus, List } from "lucide-react";
+import { Package, LogOut, Plus, List, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useIsAdmin } from "@/hooks/use-admin";
 
 export function AppHeader({ username }: { username?: string | null }) {
   const navigate = useNavigate();
+  const { isAdmin } = useIsAdmin();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -31,6 +33,13 @@ export function AppHeader({ username }: { username?: string | null }) {
               <List className="w-4 h-4 mr-1" /> My Inventory
             </Link>
           </Button>
+          {isAdmin && (
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/admin" activeProps={{ className: "bg-accent" }}>
+                <Shield className="w-4 h-4 mr-1" /> Admin
+              </Link>
+            </Button>
+          )}
         </nav>
         <div className="flex items-center gap-3">
           {username && (
