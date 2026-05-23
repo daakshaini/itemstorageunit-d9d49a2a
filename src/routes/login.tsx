@@ -55,6 +55,16 @@ function LoginPage() {
       setErrors({ password: "Incorrect password. Please try again." });
       return;
     }
+    // Block check
+    const { data: userRes } = await supabase.auth.getUser();
+    if (userRes.user) {
+      const { data: prof } = await supabase.from("profiles").select("blocked").eq("id", userRes.user.id).maybeSingle();
+      if (prof?.blocked) {
+        await supabase.auth.signOut();
+        toast.error("Your account has been blocked. Contact the administrator.");
+        return;
+      }
+    }
     toast.success("Welcome back!");
     navigate({ to: "/inventory" });
   };
