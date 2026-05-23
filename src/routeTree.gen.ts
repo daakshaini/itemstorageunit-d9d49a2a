@@ -17,6 +17,7 @@ import { Route as AuthenticatedInventoryRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedItemsNewRouteImport } from './routes/_authenticated/items.new'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -57,6 +58,11 @@ const AuthenticatedItemsNewRoute = AuthenticatedItemsNewRouteImport.update({
   path: '/items/new',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/inventory': typeof AuthenticatedInventoryRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/items/new': typeof AuthenticatedItemsNewRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -72,6 +79,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/inventory': typeof AuthenticatedInventoryRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/items/new': typeof AuthenticatedItemsNewRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/items/new': typeof AuthenticatedItemsNewRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -94,10 +103,18 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin'
     | '/inventory'
+    | '/admin/users'
     | '/items/new'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/inventory' | '/items/new' | '/admin'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/inventory'
+    | '/admin/users'
+    | '/items/new'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -106,6 +123,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_authenticated/admin'
     | '/_authenticated/inventory'
+    | '/_authenticated/admin/users'
     | '/_authenticated/items/new'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -175,14 +193,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedItemsNewRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
