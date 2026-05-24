@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as ApiPublicInitMasterAdminRouteImport } from './routes/api/public/init-master-admin'
 import { Route as AuthenticatedItemsNewRouteImport } from './routes/_authenticated/items.new'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminSecurityRouteImport } from './routes/_authenticated/admin.security'
@@ -55,6 +56,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const ApiPublicInitMasterAdminRoute =
+  ApiPublicInitMasterAdminRouteImport.update({
+    id: '/api/public/init-master-admin',
+    path: '/api/public/init-master-admin',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedItemsNewRoute = AuthenticatedItemsNewRouteImport.update({
   id: '/items/new',
   path: '/items/new',
@@ -88,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/admin/security': typeof AuthenticatedAdminSecurityRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/items/new': typeof AuthenticatedItemsNewRoute
+  '/api/public/init-master-admin': typeof ApiPublicInitMasterAdminRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -99,6 +107,7 @@ export interface FileRoutesByTo {
   '/admin/security': typeof AuthenticatedAdminSecurityRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/items/new': typeof AuthenticatedItemsNewRoute
+  '/api/public/init-master-admin': typeof ApiPublicInitMasterAdminRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -113,6 +122,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/security': typeof AuthenticatedAdminSecurityRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/items/new': typeof AuthenticatedItemsNewRoute
+  '/api/public/init-master-admin': typeof ApiPublicInitMasterAdminRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/admin/security'
     | '/admin/users'
     | '/items/new'
+    | '/api/public/init-master-admin'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/admin/security'
     | '/admin/users'
     | '/items/new'
+    | '/api/public/init-master-admin'
     | '/admin'
   id:
     | '__root__'
@@ -151,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/security'
     | '/_authenticated/admin/users'
     | '/_authenticated/items/new'
+    | '/api/public/init-master-admin'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -159,6 +172,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  ApiPublicInitMasterAdminRoute: typeof ApiPublicInitMasterAdminRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -211,6 +225,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/init-master-admin': {
+      id: '/api/public/init-master-admin'
+      path: '/api/public/init-master-admin'
+      fullPath: '/api/public/init-master-admin'
+      preLoaderRoute: typeof ApiPublicInitMasterAdminRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/items/new': {
       id: '/_authenticated/items/new'
@@ -281,6 +302,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  ApiPublicInitMasterAdminRoute: ApiPublicInitMasterAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
