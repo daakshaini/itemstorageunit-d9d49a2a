@@ -17,9 +17,9 @@ export async function logAuthEvent(params: {
   try {
     await supabase.rpc("log_auth_event", {
       _event: params.event,
-      _username: params.username ?? null,
-      _user_id: params.userId ?? null,
-      _metadata: (params.metadata ?? null) as never,
+      _username: params.username ?? undefined,
+      _user_id: params.userId ?? undefined,
+      _metadata: (params.metadata ?? undefined) as never,
     });
   } catch (e) {
     console.error("[auth log]", e);
