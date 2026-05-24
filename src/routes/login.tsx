@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Package } from "lucide-react";
+import { checkRateLimit, logAuthEvent, recordLoginAttempt } from "@/lib/audit";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
@@ -33,6 +34,16 @@ function LoginPage() {
     if (!password) return setErrors({ password: "Password is required" });
     setLoading(true);
 
+    // Rate limit check
+    const rl = await checkRateLimit(username);
+    if (rl.locked) {
+      setLoading(false);
+      const mins = Math.ceil((rl.unlocks_in_seconds || 60) / 60);
+      await logAuthEvent({ event: "rate_limited", username });
+      toast.error(`Too many failed attempts. Try again in ~${mins} minute(s).`);
+      return;
+    }
+
     // Check whether username exists
     const { data: exists, error: rpcErr } = await supabase.rpc("username_exists", { _username: username });
     if (rpcErr) {
@@ -42,6 +53,8 @@ function LoginPage() {
     }
     if (!exists) {
       setLoading(false);
+      await recordLoginAttempt(username, false);
+      await logAuthEvent({ event: "login_failed", username, metadata: { reason: "unknown_username" } });
       setErrors({ username: "Invalid username — no account found." });
       return;
     }
@@ -52,6 +65,8 @@ function LoginPage() {
     });
     setLoading(false);
     if (error) {
+      await recordLoginAttempt(username, false);
+      await logAuthEvent({ event: "login_failed", username, metadata: { reason: "bad_password" } });
       setErrors({ password: "Incorrect password. Please try again." });
       return;
     }
@@ -60,10 +75,13 @@ function LoginPage() {
     if (userRes.user) {
       const { data: prof } = await supabase.from("profiles").select("blocked").eq("id", userRes.user.id).maybeSingle();
       if (prof?.blocked) {
+        await logAuthEvent({ event: "blocked_attempt", username, userId: userRes.user.id });
         await supabase.auth.signOut();
         toast.error("Your account has been blocked. Contact the administrator.");
         return;
       }
+      await recordLoginAttempt(username, true);
+      await logAuthEvent({ event: "login_success", username, userId: userRes.user.id });
     }
     toast.success("Welcome back!");
     navigate({ to: "/inventory" });

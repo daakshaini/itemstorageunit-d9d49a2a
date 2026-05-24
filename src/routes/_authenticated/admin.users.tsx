@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Search, Ban, CheckCircle2, Trash2, Eye } from "lucide-react";
+import { logAdminAction } from "@/lib/audit";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   component: AdminUsers,
@@ -59,6 +60,12 @@ function AdminUsers() {
   const toggleBlock = async (r: Row) => {
     const { error } = await supabase.from("profiles").update({ blocked: !r.blocked }).eq("id", r.id);
     if (error) return toast.error(error.message);
+    await logAdminAction({
+      action: r.blocked ? "unblock_user" : "block_user",
+      targetType: "user",
+      targetId: r.id,
+      targetLabel: r.username,
+    });
     toast.success(r.blocked ? "User unblocked" : "User blocked");
     setRows((prev) => prev.map((x) => (x.id === r.id ? { ...x, blocked: !x.blocked } : x)));
   };
@@ -68,6 +75,12 @@ function AdminUsers() {
     if (!confirm(`Delete user @${r.username} and all their items? This cannot be undone.`)) return;
     const { error } = await supabase.from("profiles").delete().eq("id", r.id);
     if (error) return toast.error(error.message);
+    await logAdminAction({
+      action: "delete_user",
+      targetType: "user",
+      targetId: r.id,
+      targetLabel: r.username,
+    });
     toast.success("User deleted");
     setRows((prev) => prev.filter((x) => x.id !== r.id));
   };
