@@ -112,6 +112,11 @@ function LoginPage() {
         <p className="text-center text-sm text-muted-foreground mt-6">
           Don't have an account? <Link to="/signup" className="text-primary font-medium hover:underline">Sign up</Link>
         </p>
+        <div className="mt-4 pt-4 border-t text-center">
+          <Link to="/admin-login" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1">
+            🛡️ Admin Login
+          </Link>
+        </div>
       </Card>
     </div>
   );
