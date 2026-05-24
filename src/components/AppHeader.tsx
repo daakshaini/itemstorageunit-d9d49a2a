@@ -4,12 +4,18 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useIsAdmin } from "@/hooks/use-admin";
+import { logAuthEvent } from "@/lib/audit";
 
 export function AppHeader({ username }: { username?: string | null }) {
   const navigate = useNavigate();
   const { isAdmin } = useIsAdmin();
 
   const handleLogout = async () => {
+    const { data: userRes } = await supabase.auth.getUser();
+    if (userRes.user) {
+      const { data: prof } = await supabase.from("profiles").select("username").eq("id", userRes.user.id).maybeSingle();
+      await logAuthEvent({ event: "logout", username: prof?.username, userId: userRes.user.id });
+    }
     await supabase.auth.signOut();
     toast.success("Logged out");
     navigate({ to: "/login" });

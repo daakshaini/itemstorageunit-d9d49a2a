@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { RefreshCw, Package } from "lucide-react";
+import { logAuthEvent } from "@/lib/audit";
 
 export const Route = createFileRoute("/signup")({
   beforeLoad: async () => {
@@ -70,6 +71,7 @@ function SignupPage() {
       setCaptchaInput("");
       return;
     }
+    await logAuthEvent({ event: "signup", username });
     toast.success("Account created! You can now log in.");
     navigate({ to: "/login" });
   };

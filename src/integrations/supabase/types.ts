@@ -47,6 +47,75 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_actions: {
+        Row: {
+          action: string
+          admin_id: string
+          admin_username: string
+          created_at: string
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_label: string | null
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          admin_username: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_label?: string | null
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          admin_username?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_label?: string | null
+          target_type?: string
+        }
+        Relationships: []
+      }
+      auth_logs: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string | null
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
       items: {
         Row: {
           created_at: string
@@ -74,6 +143,30 @@ export type Database = {
           part_number?: string
           quantity?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      login_attempts: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          success: boolean
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          success: boolean
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+          username?: string
         }
         Relationships: []
       }
@@ -124,6 +217,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_login_rate_limit: { Args: { _username: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -132,6 +226,15 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      log_auth_event: {
+        Args: {
+          _event: string
+          _metadata?: Json
+          _user_id?: string
+          _username?: string
+        }
+        Returns: undefined
+      }
       username_exists: { Args: { _username: string }; Returns: boolean }
     }
     Enums: {
