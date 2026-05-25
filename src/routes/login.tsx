@@ -44,21 +44,6 @@ function LoginPage() {
       return;
     }
 
-    // Check whether username exists
-    const { data: exists, error: rpcErr } = await supabase.rpc("username_exists", { _username: username });
-    if (rpcErr) {
-      setLoading(false);
-      toast.error(rpcErr.message);
-      return;
-    }
-    if (!exists) {
-      setLoading(false);
-      await recordLoginAttempt(username, false);
-      await logAuthEvent({ event: "login_failed", username, metadata: { reason: "unknown_username" } });
-      setErrors({ username: "Invalid username — no account found." });
-      return;
-    }
-
     const { error } = await supabase.auth.signInWithPassword({
       email: usernameToEmail(username),
       password,
@@ -66,8 +51,8 @@ function LoginPage() {
     setLoading(false);
     if (error) {
       await recordLoginAttempt(username, false);
-      await logAuthEvent({ event: "login_failed", username, metadata: { reason: "bad_password" } });
-      setErrors({ password: "Incorrect password. Please try again." });
+      await logAuthEvent({ event: "login_failed", username, metadata: { reason: "invalid_credentials" } });
+      setErrors({ password: "Invalid username or password." });
       return;
     }
     // Block check
