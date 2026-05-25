@@ -76,7 +76,7 @@ function InventoryPage() {
       <div className="grid sm:grid-cols-3 gap-4 mb-6">
         <StatCard label="Total Items" value={items.length.toString()} />
         <StatCard label="Total Quantity" value={items.reduce((s, i) => s + i.quantity, 0).toString()} />
-        <StatCard label="Inventory Value" value={`$${total.toFixed(2)}`} />
+        <StatCard label="Inventory Value" value={`₹${total.toFixed(2)}`} />
       </div>
 
       <Card className="overflow-hidden">
@@ -106,7 +106,7 @@ function InventoryPage() {
                 <TableRow key={it.id}>
                   <TableCell className="font-mono text-sm">{it.part_number}</TableCell>
                   <TableCell className="font-medium">{it.item_name}</TableCell>
-                  <TableCell className="text-right">${Number(it.item_price).toFixed(2)}</TableCell>
+                  <TableCell className="text-right">₹{Number(it.item_price).toFixed(2)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => adjustQuantity(it.id, -1)}><Minus className="w-3 h-3" /></Button>
@@ -114,7 +114,7 @@ function InventoryPage() {
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => adjustQuantity(it.id, 1)}><Plus className="w-3 h-3" /></Button>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right font-semibold">${(it.item_price * it.quantity).toFixed(2)}</TableCell>
+                  <TableCell className="text-right font-semibold">₹{(it.item_price * it.quantity).toFixed(2)}</TableCell>
                   <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                     {new Date(it.created_at).toLocaleString()}
                   </TableCell>
