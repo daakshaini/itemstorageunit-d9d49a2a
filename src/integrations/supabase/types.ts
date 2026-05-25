@@ -235,6 +235,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      record_login_attempt: {
+        Args: { _success: boolean; _username: string }
+        Returns: undefined
+      }
       username_exists: { Args: { _username: string }; Returns: boolean }
     }
     Enums: {
