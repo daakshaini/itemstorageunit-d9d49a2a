@@ -28,7 +28,7 @@ export async function logAuthEvent(params: {
 
 export async function recordLoginAttempt(username: string, success: boolean) {
   try {
-    await supabase.from("login_attempts").insert({ username, success });
+    await supabase.rpc("record_login_attempt", { _username: username, _success: success });
   } catch (e) {
     console.error("[login attempt]", e);
   }
