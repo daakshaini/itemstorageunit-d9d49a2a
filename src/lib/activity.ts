@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export async function logActivity(params: {
-  action: "create" | "update" | "delete";
+  action: "create" | "delete";
   itemName?: string | null;
   itemId?: string | null;
   details?: Record<string, unknown>;

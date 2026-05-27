@@ -41,10 +41,19 @@ function NewItemPage() {
       item_name: form.item_name.trim(),
       item_price: price,
       quantity: qty,
-    }).select("id, item_name").single();
+    }).select("id, item_name, quantity, part_number").single();
     setLoading(false);
     if (error) return toast.error(error.message);
-    await logActivity({ action: "create", itemName: inserted?.item_name, itemId: inserted?.id });
+    await logActivity({
+      action: "create",
+      itemName: inserted?.item_name,
+      itemId: inserted?.id,
+      details: {
+        quantity: inserted?.quantity ?? qty,
+        net_quantity: inserted?.quantity ?? qty,
+        part_number: inserted?.part_number,
+      },
+    });
     toast.success("Item added");
     navigate({ to: "/inventory" });
   };

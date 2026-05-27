@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Plus, Boxes, Minus } from "lucide-react";
+import { Trash2, Plus, Boxes } from "lucide-react";
 import { toast } from "sonner";
 import { logActivity } from "@/lib/activity";
 
@@ -39,6 +39,13 @@ function InventoryPage() {
   useEffect(() => {
     document.title = "My Inventory — Item Storage Unit";
     load();
+    const channel = supabase
+      .channel("items-inventory")
+      .on("postgres_changes", { event: "*", schema: "public", table: "items" }, () => load())
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -46,19 +53,14 @@ function InventoryPage() {
     const item = items.find((i) => i.id === id);
     const { error } = await supabase.from("items").delete().eq("id", id);
     if (error) return toast.error(error.message);
-    await logActivity({ action: "delete", itemName: item?.item_name, itemId: id });
+    await logActivity({
+      action: "delete",
+      itemName: item?.item_name,
+      itemId: id,
+      details: { quantity: item?.quantity ?? 0, net_quantity: 0, part_number: item?.part_number },
+    });
     toast.success("Item deleted");
     setItems((prev) => prev.filter((i) => i.id !== id));
-  };
-
-  const adjustQuantity = async (id: string, delta: number) => {
-    const item = items.find((i) => i.id === id);
-    if (!item) return;
-    const newQty = Math.max(1, item.quantity + delta);
-    const { error } = await supabase.from("items").update({ quantity: newQty }).eq("id", id);
-    if (error) return toast.error(error.message);
-    await logActivity({ action: "update", itemName: item.item_name, itemId: id, details: { from: item.quantity, to: newQty } });
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity: newQty } : i)));
   };
 
   const total = items.reduce((s, i) => s + i.item_price * i.quantity, 0);
@@ -107,13 +109,7 @@ function InventoryPage() {
                   <TableCell className="font-mono text-sm">{it.part_number}</TableCell>
                   <TableCell className="font-medium">{it.item_name}</TableCell>
                   <TableCell className="text-right">₹{Number(it.item_price).toFixed(2)}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => adjustQuantity(it.id, -1)}><Minus className="w-3 h-3" /></Button>
-                      <span className="w-8 text-center font-medium">{it.quantity}</span>
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => adjustQuantity(it.id, 1)}><Plus className="w-3 h-3" /></Button>
-                    </div>
-                  </TableCell>
+                  <TableCell className="text-right font-medium">{it.quantity}</TableCell>
                   <TableCell className="text-right font-semibold">₹{(it.item_price * it.quantity).toFixed(2)}</TableCell>
                   <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                     {new Date(it.created_at).toLocaleString()}
