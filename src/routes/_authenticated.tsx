@@ -5,8 +5,11 @@ import { AppHeader } from "@/components/AppHeader";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) throw redirect({ to: "/login" });
+    // Skip auth check during SSR — no session storage available on the server,
+    // which would falsely redirect authenticated users to /login.
+    if (typeof window === "undefined") return;
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) throw redirect({ to: "/login" });
   },
   component: AuthedLayout,
 });
