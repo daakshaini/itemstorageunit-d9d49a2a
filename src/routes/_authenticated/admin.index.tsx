@@ -20,7 +20,7 @@ function AdminDashboard() {
 
   useEffect(() => {
     document.title = "Admin Dashboard — Item Storage Unit";
-    (async () => {
+    const load = async () => {
       const [usersRes, itemsRes, qtyRes, activeRes, recentItemsRes, recentLogsRes] = await Promise.all([
         supabase.from("profiles").select("id", { count: "exact", head: true }),
         supabase.from("items").select("id", { count: "exact", head: true }),
@@ -51,7 +51,16 @@ function AdminDashboard() {
       })));
       setRecentLogs((recentLogsRes.data ?? []) as RecentLog[]);
       setLoading(false);
-    })();
+    };
+    load();
+    const channel = supabase
+      .channel("admin-dashboard")
+      .on("postgres_changes", { event: "*", schema: "public", table: "items" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "activity_logs" }, () => load())
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
