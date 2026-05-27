@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Plus, Boxes } from "lucide-react";
+import { Trash2, Plus, Boxes, Minus } from "lucide-react";
 import { toast } from "sonner";
 import { logActivity } from "@/lib/activity";
 
@@ -63,6 +63,30 @@ function InventoryPage() {
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
+  const adjustQuantity = async (id: string, delta: number) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    const newQty = item.quantity + delta;
+    if (newQty < 0) return toast.error("Quantity cannot be negative");
+    const { error } = await supabase
+      .from("items")
+      .update({ quantity: newQty })
+      .eq("id", id);
+    if (error) return toast.error(error.message);
+    await logActivity({
+      action: "update",
+      itemName: item.item_name,
+      itemId: id,
+      details: {
+        quantity: Math.abs(delta),
+        net_quantity: newQty,
+        part_number: item.part_number,
+        direction: delta > 0 ? "add" : "remove",
+      },
+    });
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity: newQty } : i)));
+  };
+
   const total = items.reduce((s, i) => s + i.item_price * i.quantity, 0);
 
   return (
@@ -109,7 +133,17 @@ function InventoryPage() {
                   <TableCell className="font-mono text-sm">{it.part_number}</TableCell>
                   <TableCell className="font-medium">{it.item_name}</TableCell>
                   <TableCell className="text-right">₹{Number(it.item_price).toFixed(2)}</TableCell>
-                  <TableCell className="text-right font-medium">{it.quantity}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="inline-flex items-center gap-1">
+                      <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => adjustQuantity(it.id, -1)} disabled={it.quantity <= 0}>
+                        <Minus className="w-3 h-3" />
+                      </Button>
+                      <span className="min-w-[2ch] text-center font-medium">{it.quantity}</span>
+                      <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => adjustQuantity(it.id, 1)}>
+                        <Plus className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right font-semibold">₹{(it.item_price * it.quantity).toFixed(2)}</TableCell>
                   <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                     {new Date(it.created_at).toLocaleString()}
