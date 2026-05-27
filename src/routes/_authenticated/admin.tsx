@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, redirect, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Users, Activity, ShieldAlert, ArrowLeft, Boxes } from "lucide-react";
+import { LayoutDashboard, Users, Activity, ShieldAlert, ArrowLeft, Boxes, ArrowLeftRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/items", label: "All Items", icon: Boxes },
+  { to: "/admin/transactions", label: "Transactions", icon: ArrowLeftRight },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/activity", label: "Activity Logs", icon: Activity },
   { to: "/admin/security", label: "Security", icon: ShieldAlert },
