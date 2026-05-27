@@ -7,21 +7,11 @@ export async function logActivity(params: {
   details?: Record<string, unknown>;
 }) {
   try {
-    const { data: userRes } = await supabase.auth.getUser();
-    const user = userRes.user;
-    if (!user) return;
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("username")
-      .eq("id", user.id)
-      .maybeSingle();
-    await supabase.from("activity_logs").insert({
-      user_id: user.id,
-      username: profile?.username ?? user.email ?? "unknown",
-      action: params.action,
-      item_name: params.itemName ?? null,
-      item_id: params.itemId ?? null,
-      details: (params.details ?? null) as never,
+    await supabase.rpc("log_activity", {
+      _action: params.action,
+      _item_name: params.itemName ?? undefined,
+      _item_id: params.itemId ?? undefined,
+      _details: (params.details ?? undefined) as never,
     });
   } catch (e) {
     console.error("[activity log]", e);
