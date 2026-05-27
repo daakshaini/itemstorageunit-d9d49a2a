@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { RefreshCw, Package } from "lucide-react";
 import { logAuthEvent } from "@/lib/audit";
+import { isAllowedUser } from "@/lib/allowed-users";
 
 export const Route = createFileRoute("/signup")({
   beforeLoad: async () => {
@@ -42,6 +43,8 @@ function SignupPage() {
     const e: Record<string, string> = {};
     if (!usernameRe.test(username))
       e.username = "Username must start with 2 and contain exactly 6 digits (e.g. 234567).";
+    else if (!isAllowedUser(username))
+      e.username = "Access Denied";
     if (!passwordRe.test(password))
       e.password = "Password needs uppercase, lowercase, number, special character & min 8 chars.";
     if (password !== confirm) e.confirm = "Passwords do not match.";
@@ -72,7 +75,7 @@ function SignupPage() {
       return;
     }
     await logAuthEvent({ event: "signup", username });
-    toast.success("Account created! You can now log in.");
+    toast.success("Don't forget the password.");
     navigate({ to: "/login" });
   };
 
