@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Package } from "lucide-react";
 import { checkRateLimit, logAuthEvent, recordLoginAttempt } from "@/lib/audit";
+import { isAllowedUser } from "@/lib/allowed-users";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
@@ -32,6 +33,9 @@ function LoginPage() {
     setErrors({});
     if (!username) return setErrors({ username: "Username is required" });
     if (!password) return setErrors({ password: "Password is required" });
+    if (username !== "masteradmin" && !isAllowedUser(username)) {
+      return setErrors({ username: "Access Denied" });
+    }
     setLoading(true);
 
     // Rate limit check
@@ -68,7 +72,7 @@ function LoginPage() {
       await recordLoginAttempt(username, true);
       await logAuthEvent({ event: "login_success", username, userId: userRes.user.id });
     }
-    toast.success("Welcome back!");
+    toast.success("You are part of BEL Machilipatnam D&E Department.");
     navigate({ to: "/inventory" });
   };
 
