@@ -226,6 +226,15 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      log_activity: {
+        Args: {
+          _action: string
+          _details?: Json
+          _item_id?: string
+          _item_name?: string
+        }
+        Returns: undefined
+      }
       log_auth_event: {
         Args: {
           _event: string
