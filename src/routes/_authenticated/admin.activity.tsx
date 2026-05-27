@@ -11,7 +11,14 @@ export const Route = createFileRoute("/_authenticated/admin/activity")({
   component: AdminActivity,
 });
 
-type Log = { id: string; username: string; action: string; item_name: string | null; created_at: string };
+type Log = {
+  id: string;
+  username: string;
+  action: string;
+  item_name: string | null;
+  created_at: string;
+  details: { quantity?: number; net_quantity?: number; part_number?: string } | null;
+};
 
 function AdminActivity() {
   const [logs, setLogs] = useState<Log[]>([]);
@@ -24,7 +31,7 @@ function AdminActivity() {
     (async () => {
       const { data } = await supabase
         .from("activity_logs")
-        .select("id, username, action, item_name, created_at")
+        .select("id, username, action, item_name, created_at, details")
         .order("created_at", { ascending: false })
         .limit(500);
       setLogs((data ?? []) as Log[]);
@@ -43,6 +50,8 @@ function AdminActivity() {
     [logs, q, filter]
   );
 
+  const actionLabel = (a: string) => (a === "create" ? "Added" : a === "delete" ? "Removed" : a);
+
   return (
     <div>
       <div className="mb-6">
@@ -56,13 +65,17 @@ function AdminActivity() {
           <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search user or item..." className="pl-9" />
         </div>
         <div className="flex gap-1">
-          {["all", "create", "update", "delete"].map((f) => (
+          {[
+            { v: "all", label: "All" },
+            { v: "create", label: "Added" },
+            { v: "delete", label: "Removed" },
+          ].map((f) => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-md text-sm capitalize border ${filter === f ? "bg-primary text-primary-foreground border-primary" : "hover:bg-accent"}`}
+              key={f.v}
+              onClick={() => setFilter(f.v)}
+              className={`px-3 py-1.5 rounded-md text-sm border ${filter === f.v ? "bg-primary text-primary-foreground border-primary" : "hover:bg-accent"}`}
             >
-              {f}
+              {f.label}
             </button>
           ))}
         </div>
@@ -80,6 +93,8 @@ function AdminActivity() {
                 <TableHead>User</TableHead>
                 <TableHead>Action</TableHead>
                 <TableHead>Item</TableHead>
+                <TableHead className="text-right">Quantity</TableHead>
+                <TableHead className="text-right">Net Qty</TableHead>
                 <TableHead>Date &amp; Time</TableHead>
               </TableRow>
             </TableHeader>
@@ -88,9 +103,13 @@ function AdminActivity() {
                 <TableRow key={l.id}>
                   <TableCell className="font-medium">@{l.username}</TableCell>
                   <TableCell>
-                    <Badge variant={l.action === "delete" ? "destructive" : "secondary"} className="capitalize">{l.action}</Badge>
+                    <Badge variant={l.action === "delete" ? "destructive" : "secondary"}>
+                      {actionLabel(l.action)}
+                    </Badge>
                   </TableCell>
                   <TableCell>{l.item_name ?? "—"}</TableCell>
+                  <TableCell className="text-right">{l.details?.quantity ?? "—"}</TableCell>
+                  <TableCell className="text-right font-semibold">{l.details?.net_quantity ?? "—"}</TableCell>
                   <TableCell className="text-sm text-muted-foreground whitespace-nowrap">{new Date(l.created_at).toLocaleString()}</TableCell>
                 </TableRow>
               ))}
